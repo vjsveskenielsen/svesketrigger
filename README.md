@@ -11,10 +11,10 @@ I use it to avoid rendering a lot of simple animations in different resolutions.
 - OSC in with custom port. Simply send the correct messages to the local IP of your system with the port of your choice.
 
 # dependencies
-Processing 3+
-Ani by Benedikt Gross
-oscP5 by Andreas Schlegel
-Syphon by Andres Colubri
+- Processing 3+
+- Ani by Benedikt Gross
+- oscP5 by Andreas Schlegel
+- Syphon by Andres Colubri
 
 # wishes for the future
 - Base animations on shaders to add visuals effects and improve framerate.
