@@ -9,6 +9,7 @@ I use it to avoid rendering a lot of simple animations in different resolutions.
 - Controls for line width and animation speed. Change in values will only affect newly triggered animations.
 - Trigger animations and controls with OSC messages or GUI.
 - OSC in with custom port. Simply send the correct messages to the local IP of your system with the port of your choice.
+- VDMX Control Surface: Open VDMX >> Add Control Surface Plugin >> Import JSON >> /vdmx/svesketrigger.json. Just change OSC output and you are ready to trigger away.
 
 # dependencies
 - Processing 3+
