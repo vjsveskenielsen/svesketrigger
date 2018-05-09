@@ -1,0 +1,219 @@
+{
+  "classArray" : [
+    "Button",
+    "Button",
+    "Button",
+    "Button",
+    "Button",
+    "Button",
+    "Slider",
+    "Slider"
+  ],
+  "keyArray" : [
+    "ring_out",
+    "ring_in",
+    "line_ltr",
+    "line_rtl",
+    "line_ttb",
+    "line_btt",
+    "linewidth",
+    "speed"
+  ],
+  "uiBuilder" : {
+    "ring_out" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/ring_out",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    },
+    "speed" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/speed",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "minRange" : 0,
+      "val" : 0.1774714543269231,
+      "publishNorm" : true,
+      "sendEnabled" : true,
+      "maxRange" : 1
+    },
+    "VVGridSize" : "{-1, -1}",
+    "ring_in" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/ring_in",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    },
+    "linewidth" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/linewidth",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "minRange" : 0,
+      "val" : 0.4406550480769231,
+      "publishNorm" : true,
+      "sendEnabled" : true,
+      "maxRange" : 1
+    },
+    "line_rtl" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/line_rtl",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    },
+    "line_ltr" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/line_ltr",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    },
+    "line_ttb" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/line_ttb",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    },
+    "line_btt" : {
+      "sndrs" : [
+        {
+          "msgAddress" : "\/svesketrigger\/line_btt",
+          "normalizeFlag" : true,
+          "floatInvertFlag" : false,
+          "outputPort" : 9999,
+          "boolInvertFlag" : false,
+          "boolThreshVal" : 0.1,
+          "highIntVal" : 100,
+          "outputIPAddress" : "192.168.42.38",
+          "outputLabel" : "OSC Out Port 1",
+          "dataSenderType" : 2,
+          "lowIntVal" : 0,
+          "enabled" : true,
+          "intInvertFlag" : false,
+          "senderType" : 4
+        }
+      ],
+      "sendEnabled" : true,
+      "toggle" : false,
+      "mtxFlg" : false,
+      "mtxGrp" : "Button Group"
+    }
+  }
+}
