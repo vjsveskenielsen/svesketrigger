@@ -5,25 +5,32 @@ import oscP5.*;
 import netP5.*;
 import processing.net.*;
 
-String[] types = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
+String[] triggers = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
+String[] eases = {"LINEAR", "EASE IN", "EASE OUT", "EASE IN_OUT"};
+int[] size_presets = {480, 640, 720, 800, 1024, 1200, 1920};
+
 OscP5 oscP5;
-Slider s1, s2;
+Slider slider_s_w, slider_s_h;
 Numberbox n1, n2, n3, n4;
-Toggle t1;
+Toggle toggle_resize_lock;
+Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
 CallbackListener cb;
-Bang ipUpdateBang, sWadd, sWsub, sHadd, sHsub;
+RadioButton radio_w_presets, radio_h_presets, radio_eases;
+
 String ipAdress;
 
 ControlP5 cp5;
 
 Server localServer;
 
-PGraphics syphon;
+PGraphics canvas;
 SyphonServer server;
-boolean resizeIO;
-int syphonW, syphonH, sW, sH, linewidth;
+boolean bool_resize_lock;
+int canvas_width, canvas_height, sW, sH, linewidth;
 float speed;
 int easing;
+
+PShader rings;
 
 ArrayList<Animation> animations = new ArrayList<Animation>();
 
@@ -43,12 +50,16 @@ void setup() {
   controlSetup();
   oscP5 = new OscP5(this, 9999);
 
-  syphon = createGraphics(syphonW, syphonH, P3D);
-  server = new SyphonServer(this, "svesketrigger syphon");
+  canvas = createGraphics(canvas_width, canvas_height, P3D);
+  server = new SyphonServer(this, "svesketrigger");
   smooth();
+
+  rings = loadShader("data/rings.glsl");
+  rings.set("resolution", float(canvas_width), float(canvas_height));
 }
 
 void draw() {
+  if (keyPressed && keyCode=='p') println(mouseX + " " + mouseY);
   background(127);
   if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
     logotint = 180;
@@ -57,47 +68,55 @@ void draw() {
     logotint = 10;
   }
   tint(logotint);
-  image(logo, 335, 10, 30, 30);
-    tint(255);
-  if (resizeIO) {
-    cp5.getController("syphonW").setLock(false);
-    cp5.getController("syphonH").setLock(false);
+  image(logo, 345, 10, 30, 30);
+  tint(255);
+  if (bool_resize_lock) {
+    cp5.getController("canvas_width").setLock(false);
+    cp5.getController("canvas_height").setLock(false);
     resizeSyphonToWindow();
   } else {
-    cp5.getController("syphonW").setLock(true);
-    cp5.getController("syphonH").setLock(true);
+    cp5.getController("canvas_width").setLock(true);
+    cp5.getController("canvas_height").setLock(true);
   }
-  syphon.beginDraw();
-  syphon.background(0);
-  syphon.endDraw();
+  canvas.beginDraw();
+  canvas.background(0);
+
 
   for (int i = animations.size() - 1; i >= 0; i--) {
+    canvas.noFill();
+    canvas.stroke(255);
     Animation a = animations.get(i);
     if (!a.active) {
       animations.remove(i);
-    } else { 
+    } else {
       a.update();
+      if (i == 0) {
+        rings.set("nf", a.progress);
+        canvas.shader(rings);
+        canvas.rect(0,0, canvas_width, canvas_height);
+      }
     }
   }
-
-  image(syphon, (width/2)-(sW/2), 100+(width/2)-(sH/2), sW, sH);
-  server.sendImage(syphon);
+  canvas.endDraw();
+  image(canvas, (width/2)-(sW/2), 100+(width/2)-(sH/2), sW, sH);
+  server.sendImage(canvas);
 }
 
-public void newSyphon() {
-  PGraphics s = createGraphics(syphonW, syphonH, P3D);
-  syphon = s;
+public void createCanvas() {
+  PGraphics temp_canvas = createGraphics(canvas_width, canvas_height, P3D);
+  canvas = temp_canvas;
+  rings.set("resolution", float(canvas_width), float(canvas_height));
 }
 
 void resizeSyphonToWindow() {
   int max = width-20;
   float tW, tH;
-  if (syphonW > syphonH) {
+  if (canvas_width > canvas_height) {
     tW = max;
-    tH = (tW/syphonW)*syphonH;
+    tH = (tW/canvas_width)*canvas_height;
   } else {
     tH = max;
-    tW = (tH/syphonH)*syphonW;
+    tW = (tH/canvas_height)*canvas_width;
   }
   sW = ceil(tW);
   sH = ceil(tH);
@@ -128,7 +147,7 @@ void oscEvent(OscMessage theOscMessage) {
 
 // filter incoming triggers from osc and cp5
 void chooseAnimation(String type) {
-  for (String t : types) {
+  for (String t : triggers) {
     if (type.equals(t) == true) {
       animations.add(new Animation(t, speed, .0, 1.));
       return;
@@ -136,7 +155,7 @@ void chooseAnimation(String type) {
   }
 }
 
-void makeOSC() {  
+void makeOSC() {
   int p1 = (int)cp5.getController("n1").getValue();
   int p2 = (int)cp5.getController("n2").getValue();
   int p3 = (int)cp5.getController("n3").getValue();
@@ -146,11 +165,11 @@ void makeOSC() {
 
 void updateIP() {
   ipAdress = Server.ip();
-  cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
 }
 
 
-void mousePressed() { 
+void mousePressed() {
   if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
     link("http://sveskenielsen.dk/");
   }

@@ -1,4 +1,4 @@
-import codeanticode.syphon.*;
+import codeanticode.canvas.*;
 import controlP5.*;
 import de.looksgood.ani.*;
 import oscP5.*;
@@ -7,21 +7,21 @@ import processing.net.*;
 
 String[] types = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
 OscP5 oscP5;
-Slider s1, s2;
+Slider slider_s_w, slider_s_h;
 Numberbox n1, n2, n3, n4;
-Toggle t1;
+Toggle toggle_resize_lock;
 CallbackListener cb;
-Bang ipUpdateBang, sWadd, sWsub, sHadd, sHsub;
+Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
 String ipAdress;
 
 ControlP5 cp5;
 
 Server localServer;
 
-PGraphics syphon;
+PGraphics canvas;
 SyphonServer server;
-boolean resizeIO;
-int syphonW, syphonH, sW, sH, linewidth;
+boolean bool_resize_lock;
+int canvas_width, canvas_height, canvas_win_width, canvas_win_height, linewidth;
 float speed;
 int easing;
 
@@ -43,8 +43,8 @@ void setup() {
   controlSetup();
   oscP5 = new OscP5(this, 9999);
 
-  syphon = createGraphics(syphonW, syphonH, P3D);
-  server = new SyphonServer(this, "svesketrigger syphon");
+  canvas = createGraphics(canvas_width, canvas_height, P3D);
+  server = new SyphonServer(this, "svesketrigger canvas");
   smooth();
 }
 
@@ -59,17 +59,17 @@ void draw() {
   tint(logotint);
   image(logo, 335, 10, 30, 30);
     tint(255);
-  if (resizeIO) {
-    cp5.getController("syphonW").setLock(false);
-    cp5.getController("syphonH").setLock(false);
-    resizeSyphonToWindow();
+  if (bool_resize_lock) {
+    cp5.getController("canvas_width").setLock(false);
+    cp5.getController("canvas_height").setLock(false);
+    fitCanvasInWindow();
   } else {
-    cp5.getController("syphonW").setLock(true);
-    cp5.getController("syphonH").setLock(true);
+    cp5.getController("canvas_width").setLock(true);
+    cp5.getController("canvas_height").setLock(true);
   }
-  syphon.beginDraw();
-  syphon.background(0);
-  syphon.endDraw();
+  canvas.beginDraw();
+  canvas.background(0);
+  canvas.endDraw();
 
   for (int i = animations.size() - 1; i >= 0; i--) {
     Animation a = animations.get(i);
@@ -80,27 +80,27 @@ void draw() {
     }
   }
 
-  image(syphon, (width/2)-(sW/2), 100+(width/2)-(sH/2), sW, sH);
-  server.sendImage(syphon);
+  image(canvas, (width/2)-(canvas_win_width/2), 100+(width/2)-(canvas_win_height/2), canvas_win_width, canvas_win_height);
+  server.sendImage(canvas);
 }
 
-public void newSyphon() {
-  PGraphics s = createGraphics(syphonW, syphonH, P3D);
-  syphon = s;
+public void createCanvas() {
+  PGraphics s = createGraphics(canvas_width, canvas_height, P3D);
+  canvas = s;
 }
 
-void resizeSyphonToWindow() {
+void fitCanvasInWindow() {
   int max = width-20;
   float tW, tH;
-  if (syphonW > syphonH) {
+  if (canvas_width > canvas_height) {
     tW = max;
-    tH = (tW/syphonW)*syphonH;
+    tH = (tW/canvas_width)*canvas_height;
   } else {
     tH = max;
-    tW = (tH/syphonH)*syphonW;
+    tW = (tH/canvas_height)*canvas_width;
   }
-  sW = ceil(tW);
-  sH = ceil(tH);
+  canvas_win_width = ceil(tW);
+  canvas_win_height = ceil(tH);
 
   // add nice dark grey area
   fill(100);
@@ -146,7 +146,7 @@ void makeOSC() {
 
 void updateIP() {
   ipAdress = Server.ip();
-  cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
 }
 
 

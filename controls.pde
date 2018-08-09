@@ -1,56 +1,99 @@
 void controlSetup() {
   cp5 = new ControlP5(this);
 
-  s1 = cp5.addSlider("syphonW")
-    .setPosition(10, 10)
-    .setSize(200, 30)
+  int xoff = 10;
+  int yoff = 15;
+  bang_s_w_sub = cp5.addBang("syphonWsub")
+    .setPosition(xoff, yoff)
+    .setSize(15, 20)
+    .setTriggerEvent(Bang.RELEASE)
+    .setLabelVisible(false);
+  ;
+
+  xoff += 15+5;
+  int slider_width = 270;
+  slider_s_w = cp5.addSlider("canvas_width")
+    .setPosition(xoff, yoff)
+    .setSize(slider_width, 20)
     .setRange(1, 2400)
     .setValue(1200)
     ;
 
-  sWadd = cp5.addBang("syphonWadd")
-    .setPosition(170, 40)
-    .setSize(40, 10)
+  xoff += slider_width+5;
+  bang_s_w_add = cp5.addBang("syphonWadd")
+    .setPosition(xoff, yoff)
+    .setSize(15, 20)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
 
-  sWsub = cp5.addBang("syphonWsub")
-    .setPosition(10, 40)
-    .setSize(40, 10)
+  xoff = 10;
+  yoff+= 25;
+  radio_w_presets = cp5.addRadioButton("radio_w_presets")
+    .setPosition(xoff, yoff)
+    .setItemWidth(10)
+    .setItemHeight(10)
+    .setItemsPerRow(size_presets.length)
+    .setSpacingColumn(30)
+    .setNoneSelectedAllowed(true)
+    ;
+
+
+  xoff=10;
+  yoff+=15;
+  bang_s_h_sub = cp5.addBang("syphonHsub")
+    .setPosition(xoff, yoff)
+    .setSize(15, 20)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
-  s2 = cp5.addSlider("syphonH")
-    .setPosition(10, 50)
-    .setSize(200, 30)
+
+  xoff += 15+5;
+  slider_s_h = cp5.addSlider("canvas_height")
+    .setPosition(xoff, yoff)
+    .setSize(150, 20)
     .setRange(1, 2400)
     .setValue(800)
     ;
 
-  sHadd = cp5.addBang("syphonHadd")
-    .setPosition(170, 80)
-    .setSize(40, 10)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabelVisible(false)
-    ;
-  sHsub = cp5.addBang("syphonHsub")
-    .setPosition(10, 80)
-    .setSize(40, 10)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabelVisible(false);
-  ;
-
-  t1 = cp5.addToggle("resizeIO")
-    .setPosition(260, 10)
+  xoff=width-15-50;
+  toggle_resize_lock = cp5.addToggle("bool_resize_lock")
+    .setPosition(xoff, yoff)
     .setSize(50, 20)
     .setValue(true)
     .setMode(ControlP5.SWITCH)
     .setLabel("resize lock")
     ;
 
+  xoff += 150+5;
+  bang_s_h_add = cp5.addBang("syphonHadd")
+    .setPosition(xoff, yoff)
+    .setSize(15, 20)
+    .setTriggerEvent(Bang.RELEASE)
+    .setLabelVisible(false)
+    ;
+
+  xoff = 10;
+  yoff += 25;
+  radio_h_presets = cp5.addRadioButton("radio_h_presets")
+    .setPosition(xoff, yoff)
+    .setItemWidth(10)
+    .setItemHeight(10)
+    .setItemsPerRow(size_presets.length)
+    .setSpacingColumn(30)
+    .setNoneSelectedAllowed(true)
+    ;
+
+  for (int i = 0; i<size_presets.length; i++) {
+    String name = str(size_presets[i]);
+    radio_h_presets.addItem(name, i);
+    radio_w_presets.addItem(name+" ", i);
+  }
+
+  xoff = 0;
+  yoff = 10;
   Group howto = cp5.addGroup("howto")
-    .setPosition(260, 80)
+    .setPosition(xoff, yoff)
     .setWidth(130)
     .activateEvent(true)
     .setBackgroundColor(color(80))
@@ -89,13 +132,14 @@ void controlSetup() {
     + "\n" +
     "Slider values must be normalised floats"
     + "\n" + "\n" +
-    "/linewidth" 
+    "/linewidth"
     + "\n" +
     "/speed"
     )
     ;
+  xoff += 130;
   Group port = cp5.addGroup("port")
-    .setPosition(260, 60)
+    .setPosition(xoff, yoff)
     .setWidth(130)
     .activateEvent(true)
     .setBackgroundColor(color(80))
@@ -153,7 +197,7 @@ void controlSetup() {
     .setGroup("port")
     ;
 
-  ipUpdateBang =  cp5.addBang("ipUpdateBang")
+  bang_update_ip =  cp5.addBang("bang_update_ip")
     .setPosition(5, 50)
     .setSize(30, 30)
     .setTriggerEvent(Bang.RELEASE)
@@ -180,59 +224,27 @@ void controlSetup() {
     .setLabel("animation speed")
     ;
 
-  cp5.addBang("ring_out")
-    .setPosition(10, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("ring_out")
-    ;
+  xoff = 10;
+  yoff = 500;
+  for (int i = 0; i<triggers.length; i++) {
+    cp5.addBang(triggers[i])
+      .setPosition(xoff, yoff)
+      .setSize(40, 40)
+      .setTriggerEvent(Bang.RELEASE)
+      .setLabel(triggers[i])
+      ;
+  xoff+=45;
+  }
 
-  cp5.addBang("ring_in")
-    .setPosition(55, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("ring_in")
-    ;
-
-  cp5.addBang("line_ltr")
-    .setPosition(100, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("line_ltr")
-    ;
-
-  cp5.addBang("line_rtl")
-    .setPosition(145, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("line_rtl")
-    ;
-
-  cp5.addBang("line_ttb")
-    .setPosition(190, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("line_ttb")
-    ;
-
-  cp5.addBang("line_btt")
-    .setPosition(235, 500)
-    .setSize(40, 40)
-    .setTriggerEvent(Bang.RELEASE)
-    .setLabel("line_btt")
-    ;
-
-  cp5.addRadioButton("typeRadio")
+  radio_eases = cp5.addRadioButton("radio_eases")
     .setPosition(300, 500)
     .setItemWidth(20)
     .setItemHeight(20)
     .setNoneSelectedAllowed(false)
-    .addItem("LINEAR", 0)
-    .addItem("EASE IN", 1) 
-    .addItem("EASE OUT", 2)
-    .addItem("EASE IN_OUT", 3)
-    .activate(0)
     ;
+  for (int i = 0; i<eases.length; i++) radio_eases.addItem(eases[i], i);
+  radio_eases.activate(0);
+
   cb = new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
       switch(theEvent.getAction()) {
@@ -250,50 +262,40 @@ void controlSetup() {
 
   n1.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) {
-        makeOSC();
-      }
+      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) makeOSC();
     }
   }
   );
   n2.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) {
-        makeOSC();
-      }
+      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) makeOSC();
     }
   }
   );
   n3.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) {
-        makeOSC();
-      }
+      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) makeOSC();
     }
   }
   );
   n4.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) {
-        makeOSC();
-      }
+      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) makeOSC();
     }
   }
   );
   n4.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE) {
-        makeOSC();
-      }
+      if (theEvent.getAction()==ControlP5.ACTION_RELEASED || theEvent.getAction()==ControlP5.ACTION_RELEASEDOUTSIDE)  makeOSC();
     }
   }
   );
-  ipUpdateBang.addCallback(new CallbackListener() {
+  bang_update_ip.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
       if (theEvent.getAction()==ControlP5.ACTION_ENTER) {
-        cp5.getController("ipUpdateBang").setLabel("Click to update local IP");
+        cp5.getController("bang_update_ip").setLabel("Click to update local IP");
       } else if (theEvent.getAction()==ControlP5.ACTION_LEAVE) {
-        cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+        cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
       }
     }
   }
@@ -315,29 +317,39 @@ void typeRadio(int theC) {
     Ani.setDefaultEasing(Ani.SINE_IN_OUT);
     break;
   }
-} 
+}
+
+void radio_w_presets(int theC){
+  radio_w_presets.deactivateAll();
+  cp5.getController("canvas_width").setValue(size_presets[theC]);
+}
+void radio_h_presets(int theC){
+  radio_h_presets.deactivateAll();
+  cp5.getController("canvas_height").setValue(size_presets[theC]);
+}
 
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(s1) || theEvent.getController().equals(s2) ) {
-      newSyphon();
-    } else if (theEvent.getController().equals(ipUpdateBang)) {
+    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+      createCanvas();
+    } else if (theEvent.getController().equals(bang_update_ip)) {
       updateIP();
-    } 
-    if (theEvent.getController().equals(sWadd)) {
-      adjustSyphon("syphonW", 1);
-    } else if (theEvent.getController().equals(sWsub)) {
-      adjustSyphon("syphonW", -1);
-    } else if (theEvent.getController().equals(sHadd)) {
-      adjustSyphon("syphonH", 1);
-    } else if (theEvent.getController().equals(sHsub)) {
-      adjustSyphon("syphonH", -1);
     }
+    if (theEvent.getController().equals(bang_s_w_add)) {
+      adjustSyphon("canvas_width", 1);
+    } else if (theEvent.getController().equals(bang_s_w_sub)) {
+      adjustSyphon("canvas_width", -1);
+    } else if (theEvent.getController().equals(bang_s_h_add)) {
+      adjustSyphon("canvas_height", 1);
+    } else if (theEvent.getController().equals(bang_s_h_sub)) {
+      adjustSyphon("canvas_height", -1);
+    }
+
     // pass through chooseAnimation()
     else {
-      for (int t = 0; t<types.length; t++) {
-        if (types[t] == name) {
+      for (int t = 0; t<triggers.length; t++) {
+        if (triggers[t] == name) {
           chooseAnimation(name);
         }
       }

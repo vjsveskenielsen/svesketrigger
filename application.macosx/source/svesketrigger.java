@@ -3,7 +3,7 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
-import codeanticode.syphon.*; 
+import codeanticode.canvas.*; 
 import controlP5.*; 
 import de.looksgood.ani.*; 
 import oscP5.*; 
@@ -30,21 +30,21 @@ public class svesketrigger extends PApplet {
 
 String[] types = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
 OscP5 oscP5;
-Slider s1, s2;
+Slider slider_s_w, slider_s_h;
 Numberbox n1, n2, n3, n4;
-Toggle t1;
+Toggle toggle_resize_lock;
 CallbackListener cb;
-Bang ipUpdateBang, sWadd, sWsub, sHadd, sHsub;
+Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
 String ipAdress;
 
 ControlP5 cp5;
 
 Server localServer;
 
-PGraphics syphon;
+PGraphics canvas;
 SyphonServer server;
-boolean resizeIO;
-int syphonW, syphonH, sW, sH, linewidth;
+boolean bool_resize_lock;
+int canvas_width, canvas_height, canvas_win_width, canvas_win_height, linewidth;
 float speed;
 int easing;
 
@@ -66,8 +66,8 @@ public void setup() {
   controlSetup();
   oscP5 = new OscP5(this, 9999);
 
-  syphon = createGraphics(syphonW, syphonH, P3D);
-  server = new SyphonServer(this, "svesketrigger syphon");
+  canvas = createGraphics(canvas_width, canvas_height, P3D);
+  server = new SyphonServer(this, "svesketrigger canvas");
   
 }
 
@@ -82,17 +82,17 @@ public void draw() {
   tint(logotint);
   image(logo, 335, 10, 30, 30);
     tint(255);
-  if (resizeIO) {
-    cp5.getController("syphonW").setLock(false);
-    cp5.getController("syphonH").setLock(false);
-    resizeSyphonToWindow();
+  if (bool_resize_lock) {
+    cp5.getController("canvas_width").setLock(false);
+    cp5.getController("canvas_height").setLock(false);
+    fitCanvasInWindow();
   } else {
-    cp5.getController("syphonW").setLock(true);
-    cp5.getController("syphonH").setLock(true);
+    cp5.getController("canvas_width").setLock(true);
+    cp5.getController("canvas_height").setLock(true);
   }
-  syphon.beginDraw();
-  syphon.background(0);
-  syphon.endDraw();
+  canvas.beginDraw();
+  canvas.background(0);
+  canvas.endDraw();
 
   for (int i = animations.size() - 1; i >= 0; i--) {
     Animation a = animations.get(i);
@@ -103,27 +103,27 @@ public void draw() {
     }
   }
 
-  image(syphon, (width/2)-(sW/2), 100+(width/2)-(sH/2), sW, sH);
-  server.sendImage(syphon);
+  image(canvas, (width/2)-(canvas_win_width/2), 100+(width/2)-(canvas_win_height/2), canvas_win_width, canvas_win_height);
+  server.sendImage(canvas);
 }
 
-public void newSyphon() {
-  PGraphics s = createGraphics(syphonW, syphonH, P3D);
-  syphon = s;
+public void createCanvas() {
+  PGraphics s = createGraphics(canvas_width, canvas_height, P3D);
+  canvas = s;
 }
 
-public void resizeSyphonToWindow() {
+public void fitCanvasInWindow() {
   int max = width-20;
   float tW, tH;
-  if (syphonW > syphonH) {
+  if (canvas_width > canvas_height) {
     tW = max;
-    tH = (tW/syphonW)*syphonH;
+    tH = (tW/canvas_width)*canvas_height;
   } else {
     tH = max;
-    tW = (tH/syphonH)*syphonW;
+    tW = (tH/canvas_height)*canvas_width;
   }
-  sW = ceil(tW);
-  sH = ceil(tH);
+  canvas_win_width = ceil(tW);
+  canvas_win_height = ceil(tH);
 
   // add nice dark grey area
   fill(100);
@@ -169,7 +169,7 @@ public void makeOSC() {
 
 public void updateIP() {
   ipAdress = Server.ip();
-  cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
 }
 
 
@@ -194,10 +194,10 @@ class Animation {
     locallinewidth = linewidth;
   }
   public void update() {
-    syphon.beginDraw();
-    syphon.noFill();
-    syphon.stroke(255);
-    syphon.strokeWeight(locallinewidth);
+    canvas.beginDraw();
+    canvas.noFill();
+    canvas.stroke(255);
+    canvas.strokeWeight(locallinewidth);
     if (type=="ring_out") {
       ring_out();
     }
@@ -216,39 +216,39 @@ class Animation {
     if (type=="line_btt") {
       line_btt();
     }
-    syphon.endDraw();
+    canvas.endDraw();
   }
 
   public void ring_out() {
-    syphon.translate(syphonW/2, syphonH/2);
-    float goal = dist(0, 0, syphonW+locallinewidth, syphonH+locallinewidth); 
-    syphon.ellipse(0, 0, progress*goal, progress*goal);
+    canvas.translate(canvas_width/2, canvas_height/2);
+    float goal = dist(0, 0, canvas_width+locallinewidth, canvas_height+locallinewidth); 
+    canvas.ellipse(0, 0, progress*goal, progress*goal);
   }
 
   public void ring_in() {
-    syphon.translate(syphonW/2, syphonH/2);
-    float goal = dist(0, 0, syphonW+locallinewidth, syphonH+locallinewidth); 
-    syphon.ellipse(0, 0, (1-progress)*goal, (1-progress)*goal);
+    canvas.translate(canvas_width/2, canvas_height/2);
+    float goal = dist(0, 0, canvas_width+locallinewidth, canvas_height+locallinewidth); 
+    canvas.ellipse(0, 0, (1-progress)*goal, (1-progress)*goal);
   }
 
   public void line_ltr() {
-    float p = map(progress, 0,1, 0-locallinewidth, syphonW+locallinewidth);
-    syphon.line(p, 0, p, syphonH);
+    float p = map(progress, 0,1, 0-locallinewidth, canvas_width+locallinewidth);
+    canvas.line(p, 0, p, canvas_height);
   }
 
   public void line_rtl() {
-    float p = map(progress, 0,1, syphonW+locallinewidth,0-locallinewidth);
-    syphon.line(p, 0, p, syphonH);
+    float p = map(progress, 0,1, canvas_width+locallinewidth,0-locallinewidth);
+    canvas.line(p, 0, p, canvas_height);
   }
 
   public void line_ttb() {
-    float p = map(progress, 0,1, 0-locallinewidth, syphonH+locallinewidth);
-    syphon.line(0, p, syphonW, p);
+    float p = map(progress, 0,1, 0-locallinewidth, canvas_height+locallinewidth);
+    canvas.line(0, p, canvas_width, p);
   }
 
   public void line_btt() {
-    float p = map(progress, 0,1, syphonH+locallinewidth,0-locallinewidth);
-    syphon.line(0, p, syphonW, p);
+    float p = map(progress, 0,1, canvas_height+locallinewidth,0-locallinewidth);
+    canvas.line(0, p, canvas_width, p);
   }
 
   public void killObject() {
@@ -258,47 +258,47 @@ class Animation {
 public void controlSetup() {
   cp5 = new ControlP5(this);
 
-  s1 = cp5.addSlider("syphonW")
+  slider_s_w = cp5.addSlider("canvas_width")
     .setPosition(10, 10)
     .setSize(200, 30)
     .setRange(1, 2400)
     .setValue(1200)
     ;
 
-  sWadd = cp5.addBang("syphonWadd")
+  bang_s_w_add = cp5.addBang("syphonWadd")
     .setPosition(170, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
 
-  sWsub = cp5.addBang("syphonWsub")
+  bang_s_w_sub = cp5.addBang("syphonWsub")
     .setPosition(10, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
-  s2 = cp5.addSlider("syphonH")
+  slider_s_h = cp5.addSlider("canvas_height")
     .setPosition(10, 50)
     .setSize(200, 30)
     .setRange(1, 2400)
     .setValue(800)
     ;
 
-  sHadd = cp5.addBang("syphonHadd")
+  bang_s_h_add = cp5.addBang("syphonHadd")
     .setPosition(170, 80)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
-  sHsub = cp5.addBang("syphonHsub")
+  bang_s_h_sub = cp5.addBang("syphonHsub")
     .setPosition(10, 80)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
 
-  t1 = cp5.addToggle("resizeIO")
+  toggle_resize_lock = cp5.addToggle("bool_resize_lock")
     .setPosition(260, 10)
     .setSize(50, 20)
     .setValue(true)
@@ -410,7 +410,7 @@ public void controlSetup() {
     .setGroup("port")
     ;
 
-  ipUpdateBang =  cp5.addBang("ipUpdateBang")
+  bang_update_ip =  cp5.addBang("bang_update_ip")
     .setPosition(5, 50)
     .setSize(30, 30)
     .setTriggerEvent(Bang.RELEASE)
@@ -545,12 +545,12 @@ public void controlSetup() {
     }
   }
   );
-  ipUpdateBang.addCallback(new CallbackListener() {
+  bang_update_ip.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
       if (theEvent.getAction()==ControlP5.ACTION_ENTER) {
-        cp5.getController("ipUpdateBang").setLabel("Click to update local IP");
+        cp5.getController("bang_update_ip").setLabel("Click to update local IP");
       } else if (theEvent.getAction()==ControlP5.ACTION_LEAVE) {
-        cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+        cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
       }
     }
   }
@@ -577,19 +577,19 @@ public void typeRadio(int theC) {
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(s1) || theEvent.getController().equals(s2) ) {
-      newSyphon();
-    } else if (theEvent.getController().equals(ipUpdateBang)) {
+    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+      createCanvas();
+    } else if (theEvent.getController().equals(bang_update_ip)) {
       updateIP();
     } 
-    if (theEvent.getController().equals(sWadd)) {
-      adjustSyphon("syphonW", 1);
-    } else if (theEvent.getController().equals(sWsub)) {
-      adjustSyphon("syphonW", -1);
-    } else if (theEvent.getController().equals(sHadd)) {
-      adjustSyphon("syphonH", 1);
-    } else if (theEvent.getController().equals(sHsub)) {
-      adjustSyphon("syphonH", -1);
+    if (theEvent.getController().equals(bang_s_w_add)) {
+      adjustSyphon("canvas_width", 1);
+    } else if (theEvent.getController().equals(bang_s_w_sub)) {
+      adjustSyphon("canvas_width", -1);
+    } else if (theEvent.getController().equals(bang_s_h_add)) {
+      adjustSyphon("canvas_height", 1);
+    } else if (theEvent.getController().equals(bang_s_h_sub)) {
+      adjustSyphon("canvas_height", -1);
     }
     // pass through chooseAnimation()
     else {

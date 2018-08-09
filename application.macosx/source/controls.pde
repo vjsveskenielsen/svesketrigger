@@ -1,47 +1,47 @@
 void controlSetup() {
   cp5 = new ControlP5(this);
 
-  s1 = cp5.addSlider("syphonW")
+  slider_s_w = cp5.addSlider("canvas_width")
     .setPosition(10, 10)
     .setSize(200, 30)
     .setRange(1, 2400)
     .setValue(1200)
     ;
 
-  sWadd = cp5.addBang("syphonWadd")
+  bang_s_w_add = cp5.addBang("syphonWadd")
     .setPosition(170, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
 
-  sWsub = cp5.addBang("syphonWsub")
+  bang_s_w_sub = cp5.addBang("syphonWsub")
     .setPosition(10, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
-  s2 = cp5.addSlider("syphonH")
+  slider_s_h = cp5.addSlider("canvas_height")
     .setPosition(10, 50)
     .setSize(200, 30)
     .setRange(1, 2400)
     .setValue(800)
     ;
 
-  sHadd = cp5.addBang("syphonHadd")
+  bang_s_h_add = cp5.addBang("syphonHadd")
     .setPosition(170, 80)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
-  sHsub = cp5.addBang("syphonHsub")
+  bang_s_h_sub = cp5.addBang("syphonHsub")
     .setPosition(10, 80)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
 
-  t1 = cp5.addToggle("resizeIO")
+  toggle_resize_lock = cp5.addToggle("bool_resize_lock")
     .setPosition(260, 10)
     .setSize(50, 20)
     .setValue(true)
@@ -153,7 +153,7 @@ void controlSetup() {
     .setGroup("port")
     ;
 
-  ipUpdateBang =  cp5.addBang("ipUpdateBang")
+  bang_update_ip =  cp5.addBang("bang_update_ip")
     .setPosition(5, 50)
     .setSize(30, 30)
     .setTriggerEvent(Bang.RELEASE)
@@ -288,12 +288,12 @@ void controlSetup() {
     }
   }
   );
-  ipUpdateBang.addCallback(new CallbackListener() {
+  bang_update_ip.addCallback(new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
       if (theEvent.getAction()==ControlP5.ACTION_ENTER) {
-        cp5.getController("ipUpdateBang").setLabel("Click to update local IP");
+        cp5.getController("bang_update_ip").setLabel("Click to update local IP");
       } else if (theEvent.getAction()==ControlP5.ACTION_LEAVE) {
-        cp5.getController("ipUpdateBang").setLabel("local IP is: " + ipAdress);
+        cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
       }
     }
   }
@@ -320,19 +320,19 @@ void typeRadio(int theC) {
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(s1) || theEvent.getController().equals(s2) ) {
-      newSyphon();
-    } else if (theEvent.getController().equals(ipUpdateBang)) {
+    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+      createCanvas();
+    } else if (theEvent.getController().equals(bang_update_ip)) {
       updateIP();
     } 
-    if (theEvent.getController().equals(sWadd)) {
-      adjustSyphon("syphonW", 1);
-    } else if (theEvent.getController().equals(sWsub)) {
-      adjustSyphon("syphonW", -1);
-    } else if (theEvent.getController().equals(sHadd)) {
-      adjustSyphon("syphonH", 1);
-    } else if (theEvent.getController().equals(sHsub)) {
-      adjustSyphon("syphonH", -1);
+    if (theEvent.getController().equals(bang_s_w_add)) {
+      adjustSyphon("canvas_width", 1);
+    } else if (theEvent.getController().equals(bang_s_w_sub)) {
+      adjustSyphon("canvas_width", -1);
+    } else if (theEvent.getController().equals(bang_s_h_add)) {
+      adjustSyphon("canvas_height", 1);
+    } else if (theEvent.getController().equals(bang_s_h_sub)) {
+      adjustSyphon("canvas_height", -1);
     }
     // pass through chooseAnimation()
     else {
