@@ -89,7 +89,7 @@ void controlSetup() {
     + "\n" +
     "Slider values must be normalised floats"
     + "\n" + "\n" +
-    "/linewidth" 
+    "/linewidth"
     + "\n" +
     "/speed"
     )
@@ -99,7 +99,7 @@ void controlSetup() {
     .setWidth(130)
     .activateEvent(true)
     .setBackgroundColor(color(80))
-    .setBackgroundHeight(110)
+    .setBackgroundHeight(150)
     .setLabel("osc connection")
     .setOpen(false);
     ;
@@ -159,8 +159,17 @@ void controlSetup() {
     .setTriggerEvent(Bang.RELEASE)
     .setGroup("port")
     .setLabel(ipAdress)
-
     ;
+
+  cp5.addTextfield("syphon_server_name")
+      .setPosition(10,110)
+      .setSize(100,30)
+      .setText(syphon_server_name)
+      .setAutoClear(false)
+      .setLabel("press enter to change syphon server name")
+      .setGroup("port")
+      ;
+
 
   updateIP();
 
@@ -228,7 +237,7 @@ void controlSetup() {
     .setItemHeight(20)
     .setNoneSelectedAllowed(false)
     .addItem("LINEAR", 0)
-    .addItem("EASE IN", 1) 
+    .addItem("EASE IN", 1)
     .addItem("EASE OUT", 2)
     .addItem("EASE IN_OUT", 3)
     .activate(0)
@@ -315,7 +324,7 @@ void typeRadio(int theC) {
     Ani.setDefaultEasing(Ani.SINE_IN_OUT);
     break;
   }
-} 
+}
 
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isController()) {
@@ -324,7 +333,7 @@ public void controlEvent(ControlEvent theEvent) {
       newSyphon();
     } else if (theEvent.getController().equals(ipUpdateBang)) {
       updateIP();
-    } 
+    }
     if (theEvent.getController().equals(sWadd)) {
       adjustSyphon("syphonW", 1);
     } else if (theEvent.getController().equals(sWsub)) {
@@ -352,4 +361,10 @@ void adjustSyphon(String con, int value) {
   } else if (value > 0 && init < cp5.getController(con).getMax()) {
     cp5.getController(con).setValue(init+value);
   }
+}
+
+public void syphon_server_name(String theText) {
+  // automatically receives results from controller input
+  syphon_server_name = theText;
+  newSyphonServer();
 }

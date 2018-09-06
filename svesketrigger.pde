@@ -19,6 +19,7 @@ ControlP5 cp5;
 Server localServer;
 
 PGraphics syphon;
+String syphon_server_name = "svesketrigger";
 SyphonServer server;
 boolean resizeIO;
 int syphonW, syphonH, sW, sH, linewidth;
@@ -44,7 +45,7 @@ void setup() {
   oscP5 = new OscP5(this, 9999);
 
   syphon = createGraphics(syphonW, syphonH, P3D);
-  server = new SyphonServer(this, "svesketrigger syphon");
+  newSyphonServer();
   smooth();
 }
 
@@ -75,7 +76,7 @@ void draw() {
     Animation a = animations.get(i);
     if (!a.active) {
       animations.remove(i);
-    } else { 
+    } else {
       a.update();
     }
   }
@@ -88,6 +89,8 @@ public void newSyphon() {
   PGraphics s = createGraphics(syphonW, syphonH, P3D);
   syphon = s;
 }
+
+public void newSyphonServer() server = new SyphonServer(this, syphon_server_name);
 
 void resizeSyphonToWindow() {
   int max = width-20;
@@ -136,7 +139,7 @@ void chooseAnimation(String type) {
   }
 }
 
-void makeOSC() {  
+void makeOSC() {
   int p1 = (int)cp5.getController("n1").getValue();
   int p2 = (int)cp5.getController("n2").getValue();
   int p3 = (int)cp5.getController("n3").getValue();
@@ -150,7 +153,7 @@ void updateIP() {
 }
 
 
-void mousePressed() { 
+void mousePressed() {
   if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
     link("http://sveskenielsen.dk/");
   }
