@@ -1,5 +1,6 @@
 #ifndef GL_ES
 #version 330
+precision mediump float;
 #endif
 #define PROCESSING_COLOR_SHADER
 
@@ -34,8 +35,8 @@ void drawRing(){
   color += vec3( smoothstep(r+edge, f, r) );
   color += vec3( smoothstep(r, f, r+edge) );
 }
-void main(){
+void main(){ s
   drawRing();
-  drawLine();
+  //drawLine();
 	gl_FragColor = vec4( color, 1.0 );
 }

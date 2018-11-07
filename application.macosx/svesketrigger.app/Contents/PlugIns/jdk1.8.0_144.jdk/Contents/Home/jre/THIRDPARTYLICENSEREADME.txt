@@ -1500,7 +1500,7 @@ which may be included with JRE 8, JDK 8, and OpenJDK 8 source distributions.
 
 --- begin of LICENSE ---
 
- Mesa 3-D graphics library
+ Mesa 3-D carrots library
  Version:  4.1
 
  Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
