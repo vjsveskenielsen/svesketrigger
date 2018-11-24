@@ -18,6 +18,7 @@ CallbackListener cb;
 RadioButton radio_w_presets, radio_h_presets, radio_eases;
 
 String ipAdress;
+int port = 9999;
 
 ControlP5 cp5;
 
@@ -26,20 +27,30 @@ Server localServer;
 PGraphics canvas;
 SyphonServer server;
 boolean bool_resize_lock;
-int canvas_width, canvas_height, sW, sH, linewidth;
-float speed;
+int canvas_width, canvas_height, sW, sH;
 int easing;
-
-PShader rings;
-
-ArrayList<Animation> animations = new ArrayList<Animation>();
 
 PImage logo;
 int logotint = 10;
 
+int n = 50;
+int a_n; //current amount of graphics
+PShader shader;
+ArrayList<Graphic> graphics = new ArrayList<Graphic>();
+Animation inactive = new Animation("inactive", 0.);
+Animation line_ttb = new Animation("line_ttb", 1., 0., 1.);
+Animation line_btt = new Animation("line_btt", 1., 1., 0.);
+Animation line_rtl = new Animation("line_rtl", 2., 0., 1.);
+Animation line_ltr = new Animation("line_ltr", 2., 1., 0.);
+Animation ring_out = new Animation("ring_out", 3., 0., 1.);
+Animation ring_in = new Animation("ring_in", 3., 1., 0.);
+
+float speed =.1, linewidth =.1;
+float bleed = 0.1;
+
 void settings() {
   size(400, 600, P3D);
-  PJOGL.profile=1;
+  //PJOGL.profile=1;
 }
 
 void setup() {
@@ -48,14 +59,17 @@ void setup() {
   Ani.setDefaultEasing(Ani.LINEAR);
 
   controlSetup();
-  oscP5 = new OscP5(this, 9999);
+  oscP5 = new OscP5(this, port);
 
   canvas = createGraphics(canvas_width, canvas_height, P3D);
   server = new SyphonServer(this, "svesketrigger");
-  smooth();
 
-  rings = loadShader("data/rings.glsl");
-  rings.set("resolution", float(canvas_width), float(canvas_height));
+  shader = loadShader("data/graphics.glsl");
+  shader.set("res", float(canvas.width), float(canvas.height));
+
+  for (int i = 0; i<n; i++) {
+    graphics.add(new Graphic(i, inactive));
+  }
 }
 
 void draw() {
@@ -78,34 +92,32 @@ void draw() {
     cp5.getController("canvas_width").setLock(true);
     cp5.getController("canvas_height").setLock(true);
   }
+  for (Graphic g : graphics) {
+    g.update();
+    //print("g" + g.target, "s:" + g.offset, round(g.progress, 1), " // ");
+  }
   canvas.beginDraw();
   canvas.background(0);
-
-
-  for (int i = animations.size() - 1; i >= 0; i--) {
-    canvas.noFill();
-    canvas.stroke(255);
-    Animation a = animations.get(i);
-    if (!a.active) {
-      animations.remove(i);
-    } else {
-      a.update();
-      if (i == 0) {
-        rings.set("nf", a.progress);
-        canvas.shader(rings);
-        canvas.rect(0,0, canvas_width, canvas_height);
-      }
-    }
-  }
+  canvas.rect(0, 0, canvas.width, canvas.height);
+  canvas.shader(shader);
   canvas.endDraw();
   image(canvas, (width/2)-(sW/2), 100+(width/2)-(sH/2), sW, sH);
+
   server.sendImage(canvas);
+
+  String txt_fps = String.format(getClass().getName()+ "   [size %d/%d]   [fps %6.2f]", width, height, frameRate);
+  surface.setTitle(txt_fps);
+}
+
+private static double round (double value, int precision) {
+  int scale = (int) Math.pow(10, precision);
+  return (double) Math.round(value * scale) / scale;
 }
 
 public void createCanvas() {
   PGraphics temp_canvas = createGraphics(canvas_width, canvas_height, P3D);
   canvas = temp_canvas;
-  rings.set("resolution", float(canvas_width), float(canvas_height));
+  shader.set("res", float(canvas.width), float(canvas.height));
 }
 
 void resizeSyphonToWindow() {
@@ -129,6 +141,7 @@ void resizeSyphonToWindow() {
 }
 //filter osc messages and pass trigger through to chooseAnimation()
 void oscEvent(OscMessage theOscMessage) {
+
   String str_in[] = split(theOscMessage.addrPattern(), '/');
   if (str_in[1].equals("svesketrigger")) {
     if (str_in[2].equals("linewidth") && theOscMessage.checkTypetag("f")) {
@@ -140,17 +153,7 @@ void oscEvent(OscMessage theOscMessage) {
       float max = cp5.getController("speed").getMax();
       cp5.getController("speed").setValue(value*max);
     } else {
-      chooseAnimation(str_in[2]);
-    }
-  }
-}
 
-// filter incoming triggers from osc and cp5
-void chooseAnimation(String type) {
-  for (String t : triggers) {
-    if (type.equals(t) == true) {
-      animations.add(new Animation(t, speed, .0, 1.));
-      return;
     }
   }
 }
@@ -168,9 +171,37 @@ void updateIP() {
   cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
 }
 
-
 void mousePressed() {
   if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
     link("http://sveskenielsen.dk/");
   }
+}
+
+void keyPressed() {
+  if (a_n < n) {
+    if (key=='1') trigAnimation(ring_in);
+    else if (key=='2') trigAnimation(ring_out);
+    else if (key=='3') trigAnimation(line_btt);
+    else if (key=='4') trigAnimation(line_ttb);
+    else if (key=='5') trigAnimation(line_rtl);
+    else if (key=='6') trigAnimation(line_ltr);
+  }
+}
+
+void trigAnimation(Animation a) {
+  /*
+  loop through graphics, and set new parameters at the first available (inactive)
+  animation object to "add" a new animation.
+  */
+  boolean found = false;
+  int id = 0;
+  while (found == false) {
+    Graphic g = graphics.get(id);
+    if (g.offset == inactive.offset) {
+      graphics.set(id, new Graphic(g.target, a));
+      found = true;
+    }
+    else id++;
+  }
+  a_n++;
 }
