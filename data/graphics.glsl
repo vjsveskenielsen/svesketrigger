@@ -94,8 +94,8 @@ vec4 drawRing(vec4 tint, float pr, float lw, float bl) {
 vec4 evaluate(vec3 g) {
 	vec4 rgba = vec4(0.);
 	if (g.x > 1. && g.x <= 2.) rgba += drawLineH(color_in, g.x-1., g.y, g.z); //color, progress, linewidth, bleed
-	else if (g.x > 2. && g.x < 3.) rgba += drawLineV(color_in, g.x-2, g1.y, g1.z);
-	else if (g.x > 3. && g.x < 4.) rgba += drawRing(color_in, g.x-3., g1.y, g1.z);
+	else if (g.x > 2. && g.x < 3.) rgba += drawLineV(color_in, g.x-2, g.y, g.z);
+	else if (g.x > 3. && g.x < 4.) rgba += drawRing(color_in, g.x-3., g.y, g.z);
 	return rgba;
 }
 
