@@ -9,23 +9,23 @@ String[] triggers = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", 
 String[] eases = {"LINEAR", "EASE IN", "EASE OUT", "EASE IN_OUT"};
 int[] size_presets = {480, 640, 720, 800, 1024, 1200, 1920};
 
-OscP5 oscP5;
+ControlP5 cp5;
+CallbackListener cb;
 Slider slider_s_w, slider_s_h;
 Numberbox n1, n2, n3, n4;
 Toggle toggle_resize_lock;
 Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
-CallbackListener cb;
 RadioButton radio_w_presets, radio_h_presets, radio_eases;
+Textfield field_port, field_syphon_name;
 
-String ipAdress;
-int port = 9999;
-
-ControlP5 cp5;
-
+OscP5 oscP5;
 Server localServer;
+String ip;
+int port = 9999;
 
 PGraphics canvas;
 SyphonServer server;
+String syphon_name = "svesketrigger";
 boolean bool_resize_lock;
 int canvas_width, canvas_height, sW, sH;
 int easing;
@@ -62,7 +62,7 @@ void setup() {
   oscP5 = new OscP5(this, port);
 
   canvas = createGraphics(canvas_width, canvas_height, P3D);
-  server = new SyphonServer(this, "svesketrigger");
+  server = new SyphonServer(this, syphon_name);
 
   shader = loadShader("data/graphics.glsl");
   shader.set("res", float(canvas.width), float(canvas.height));
@@ -158,17 +158,9 @@ void oscEvent(OscMessage theOscMessage) {
   }
 }
 
-void makeOSC() {
-  int p1 = (int)cp5.getController("n1").getValue();
-  int p2 = (int)cp5.getController("n2").getValue();
-  int p3 = (int)cp5.getController("n3").getValue();
-  int p4 = (int)cp5.getController("n4").getValue();
-  oscP5 = new OscP5(this, p1*1000 + p2*100 + p3*10 + p4);
-}
-
 void updateIP() {
-  ipAdress = Server.ip();
-  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
+  ip = Server.ip();
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
 }
 
 void mousePressed() {

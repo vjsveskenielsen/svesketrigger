@@ -158,7 +158,7 @@ void controlSetup() {
     .setSize(30, 30)
     .setTriggerEvent(Bang.RELEASE)
     .setGroup("port")
-    .setLabel(ipAdress)
+    .setLabel(ip)
 
     ;
 
@@ -293,7 +293,7 @@ void controlSetup() {
       if (theEvent.getAction()==ControlP5.ACTION_ENTER) {
         cp5.getController("bang_update_ip").setLabel("Click to update local IP");
       } else if (theEvent.getAction()==ControlP5.ACTION_LEAVE) {
-        cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
+        cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
       }
     }
   }

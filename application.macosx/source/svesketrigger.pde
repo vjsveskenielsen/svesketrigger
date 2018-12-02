@@ -12,7 +12,7 @@ Numberbox n1, n2, n3, n4;
 Toggle toggle_resize_lock;
 CallbackListener cb;
 Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
-String ipAdress;
+String ip;
 
 ControlP5 cp5;
 
@@ -145,8 +145,8 @@ void makeOSC() {
 }
 
 void updateIP() {
-  ipAdress = Server.ip();
-  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
+  ip = Server.ip();
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
 }
 
 

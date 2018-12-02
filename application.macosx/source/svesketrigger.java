@@ -35,7 +35,7 @@ Numberbox n1, n2, n3, n4;
 Toggle toggle_resize_lock;
 CallbackListener cb;
 Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
-String ipAdress;
+String ip;
 
 ControlP5 cp5;
 
@@ -168,8 +168,8 @@ public void makeOSC() {
 }
 
 public void updateIP() {
-  ipAdress = Server.ip();
-  cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
+  ip = Server.ip();
+  cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
 }
 
 
@@ -415,7 +415,7 @@ public void controlSetup() {
     .setSize(30, 30)
     .setTriggerEvent(Bang.RELEASE)
     .setGroup("port")
-    .setLabel(ipAdress)
+    .setLabel(ip)
 
     ;
 
@@ -550,7 +550,7 @@ public void controlSetup() {
       if (theEvent.getAction()==ControlP5.ACTION_ENTER) {
         cp5.getController("bang_update_ip").setLabel("Click to update local IP");
       } else if (theEvent.getAction()==ControlP5.ACTION_LEAVE) {
-        cp5.getController("bang_update_ip").setLabel("local IP is: " + ipAdress);
+        cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
       }
     }
   }
