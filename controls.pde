@@ -1,5 +1,6 @@
 void controlSetup() {
   cp5 = new ControlP5(this);
+  Controller c; //temp controller
   int grp_offset = width/3;
   int xoff = 10;
   int yoff = 10;
@@ -7,14 +8,14 @@ void controlSetup() {
   Group output = cp5.addGroup("output")
   .setPosition(0, 10)
   .setWidth(grp_offset)
-  .setLabel("output")
+  .setLabel("output settings")
   .activateEvent(true)
   ;
 
   Group osc = cp5.addGroup("osc")
   .setPosition(grp_offset,10)
   .setWidth(grp_offset)
-  .setLabel("osc connection")
+  .setLabel("osc & syphon settings")
   .activateEvent(true)
   ;
 
@@ -45,31 +46,38 @@ void controlSetup() {
 
   // OUTPUT
 
-  bang_s_w_sub = cp5.addBang("syphonWsub")
+  bang_c_w_sub = cp5.addBang("canvas_width_sub")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(200, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("-")
   ;
+  cp5.getController("canvas_width_sub").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
-  xoff += 15+5;
-  slider_s_w = cp5.addSlider("canvas_width")
+
+  xoff += 20+5;
+  slider_c_w = cp5.addSlider("canvas_width")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(200, 20)
+  .setSize(width-70, 20)
   .setRange(1, 2400)
   .setValue(640)
+  .setLabel("width: ")
   ;
+  c = cp5.getController("canvas_width");
+  c.getValueLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
+  c.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
 
-  xoff += slider_s_w.getWidth()+5;
-  bang_s_w_add = cp5.addBang("syphonWadd")
+  xoff += c.getWidth()+5;
+  bang_c_w_add = cp5.addBang("canvas_width_add")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("+")
   ;
+  cp5.getController("canvas_width_add").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
   xoff = 10;
   yoff+= 25;
@@ -79,47 +87,43 @@ void controlSetup() {
   .setItemWidth(10)
   .setItemHeight(10)
   .setItemsPerRow(size_presets.length)
-  .setSpacingColumn(30)
+  .setSpacingColumn(25)
   .setNoneSelectedAllowed(true)
   ;
 
   xoff=10;
   yoff+=15;
-  bang_s_h_sub = cp5.addBang("syphonHsub")
+  bang_s_h_sub = cp5.addBang("canvas_height_sub")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false);
+  .setLabel("-")
   ;
+  cp5.getController("canvas_height_sub").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
-  xoff += 15+5;
-  slider_s_h = cp5.addSlider("canvas_height")
+  xoff += 25;
+  slider_c_h = cp5.addSlider("canvas_height")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(150, 20)
+  .setSize(width-70, 20)
   .setRange(1, 2400)
   .setValue(480)
+  .setLabel("height: ")
   ;
+  c = cp5.getController("canvas_height");
+  c.getValueLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
+  c.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
 
-  xoff=width-15-50;
-  toggle_resize_lock = cp5.addToggle("bool_resize_lock")
+  xoff += slider_c_w.getWidth()+5;
+  bang_s_h_add = cp5.addBang("canvas_height_add")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(50, 20)
-  .setValue(true)
-  .setMode(ControlP5.SWITCH)
-  .setLabel("resize lock")
-  ;
-
-  xoff += 150+5;
-  bang_s_h_add = cp5.addBang("syphonHadd")
-  .setGroup(output)
-  .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("+")
   ;
+  cp5.getController("canvas_height_add").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
   xoff = 10;
   yoff += 25;
@@ -129,40 +133,40 @@ void controlSetup() {
   .setItemWidth(10)
   .setItemHeight(10)
   .setItemsPerRow(size_presets.length)
-  .setSpacingColumn(30)
+  .setSpacingColumn(25)
   .setNoneSelectedAllowed(true)
   ;
 
   for (int i = 0; i<size_presets.length; i++) {
     String name = str(size_presets[i]);
     radio_h_presets.addItem(name, i);
-    radio_w_presets.addItem(name+" ", i);
+    radio_w_presets.addItem(name+" ", i); //hack that allows two sets of similar items
   }
-
-  xoff = 0;
+  /*
+  xoff = width-50;
   yoff = 10;
 
-  cp5.addTextarea("txt")
-  .setGroup("howto")
-  .setPosition(5, 5)
-  .setSize(120, 400)
-  .setFont(createFont("arial", 10))
-  .setLineHeight(12)
-  .setColor(color(255))
-  .setText(addExplainer());
-
-  xoff += 10-grp_offset;
+  cp5.addBang("bang_logo")
+  .setGroup(output)
+  .setPosition(xoff, yoff)
+  .setSize(20, 20)
+  .setImage(logo)
+  .setTriggerEvent(Bang.RELEASE)
+  .setLabelVisible(false)
+  ;
+  */
+  // OSC & SYPHON
+  xoff = 10-grp_offset;
   yoff = 10;
-  // OSC
-  bang_update_ip =  cp5.addBang("bang_update_ip")
+  bang_update_ip = cp5.addBang("bang_update_ip")
   .setGroup(osc)
   .setPosition(xoff, yoff)
   .setSize(30, 30)
   .setTriggerEvent(Bang.RELEASE)
   .setLabel(ip)
   ;
-  yoff+= 50;
 
+  yoff+= 50;
   field_port = cp5.addTextfield("field_port")
   .setGroup(osc)
   .setPosition(xoff, yoff)
@@ -218,6 +222,64 @@ void controlSetup() {
     }
   }
   );
+  // HOW TO
+  xoff = 5-grp_offset*2;
+  yoff = 5;
+  cp5.addTextarea("¶1")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("Match OSC output IP and port with external OSC source " +
+  "in OSC & SYPHON SETTINGS."
+  + "\n" + "\n" +
+  "All OSC messages must begin with / svesketrigger");
+
+  xoff += grp_offset;
+  cp5.addTextarea("¶2")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset-10, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("TRIGGERS:"
+  + "\n" +
+  "... / ring_out"
+  + "\n" +
+  "... / ring_in"
+  + "\n" +
+  "... / line_ltr"
+  + "\n" +
+  "... / line_rtl"
+  + "\n" +
+  "... / line_ttb"
+  + "\n" +
+  "... / line_btt"
+
+  );
+
+  xoff += grp_offset;
+  cp5.addTextarea("¶3")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset-10, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("SLIDERS:"
+  + "\n" +
+  "Slider values must be normalised floats"
+  + "\n" + "\n" +
+  "/linewidth"
+  + "\n" +
+  "/speed"
+  + "\n" +
+  "/bleed"
+  );
+
   //TRIGGERS
   xoff = 10;
   yoff = 560;
@@ -240,6 +302,7 @@ void controlSetup() {
   .setRange(.001, 1.)
   .setValue(.5)
   .setLabel("line bleed")
+  .setId(settingsID)
   ;
   cp5.getController("bleed").getCaptionLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
 
@@ -255,12 +318,13 @@ void controlSetup() {
 
   xoff = 10;
   yoff = 500;
-  for (int i = 0; i<triggers.length; i++) {
-    cp5.addBang(triggers[i])
+  for (int i = 1; i<animations.length; i++) {
+    cp5.addBang(animations[i].type)
     .setPosition(xoff, yoff)
     .setSize(40, 40)
     .setTriggerEvent(Bang.RELEASE)
-    .setLabel(triggers[i])
+    .setLabel(animations[i].type)
+    .setId(triggerID)
     ;
     xoff+=45;
   }
@@ -275,6 +339,10 @@ void controlSetup() {
   for (int i = 0; i<eases.length; i++) radio_eases.addItem(eases[i], i);
   radio_eases.activate(0);
 
+}
+public void bang_logo(){
+  println("bang");
+  link("http://sveskenielsen.dk/");
 }
 
 void typeRadio(int theC) {
@@ -318,25 +386,21 @@ public void controlEvent(ControlEvent theEvent) {
 
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+
+    for (int i = 1; i<animations.length; i++){
+      if (name.equals(animations[i].type)) {
+        trigAnimation(animations[i]);
+      }
+    }
+    if (theEvent.getController().equals(slider_c_w) || theEvent.getController().equals(slider_c_h) ) {
       createCanvas();
     }
-    else if (theEvent.getController().equals(bang_update_ip)) {
-      updateIP();
-    }
+    else if (theEvent.getController().equals(bang_update_ip)) updateIP();
 
-    if (theEvent.getController().equals(bang_s_w_add)) {
-      adjustSyphon("canvas_width", 1);
-    }
-    else if (theEvent.getController().equals(bang_s_w_sub)) {
-      adjustSyphon("canvas_width", -1);
-    }
-    else if (theEvent.getController().equals(bang_s_h_add)) {
-      adjustSyphon("canvas_height", 1);
-    }
-    else if (theEvent.getController().equals(bang_s_h_sub)) {
-      adjustSyphon("canvas_height", -1);
-    }
+    if (theEvent.getController().equals(bang_c_w_add)) adjustSyphon("canvas_width", 1);
+    else if (theEvent.getController().equals(bang_c_w_sub)) adjustSyphon("canvas_width", -1);
+    else if (theEvent.getController().equals(bang_s_h_add)) adjustSyphon("canvas_height", 1);
+    else if (theEvent.getController().equals(bang_s_h_sub)) adjustSyphon("canvas_height", -1);
 
   }
 }
@@ -386,34 +450,4 @@ public void field_syphon_name(String theText){
 void updateOSC() {
   ip = Server.ip();
   oscP5 = new OscP5(this, port);
-}
-
-String addExplainer(){
-  String t = "Match OSC output IP and port with external OSC source in the OSC CONNECTION menu."
-  + "\n" + "\n" +
-  "All OSC messages must begin with " + "\n" +  "'' /svesketrigger/ ''"
-  + "\n" + "\n" +
-  "TRIGGERS:"
-  + "\n" +
-  "/ring_out"
-  + "\n" +
-  "/ring_in"
-  + "\n" +
-  "/line_ltr"
-  + "\n" +
-  "/line_rtl"
-  + "\n" +
-  "/line_ttb"
-  + "\n" +
-  "/line_btt"
-  + "\n" + "\n" +
-  "SLIDERS:"
-  + "\n" +
-  "Slider values must be normalised floats"
-  + "\n" + "\n" +
-  "/linewidth"
-  + "\n" +
-  "/speed"
-  ;
-  return t;
 }
