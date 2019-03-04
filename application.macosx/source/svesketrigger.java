@@ -30,11 +30,11 @@ public class svesketrigger extends PApplet {
 
 String[] types = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
 OscP5 oscP5;
-Slider slider_s_w, slider_s_h;
+Slider slider_c_w, slider_c_h;
 Numberbox n1, n2, n3, n4;
 Toggle toggle_resize_lock;
 CallbackListener cb;
-Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
+Bang bang_update_ip, bang_c_w_add, bang_c_w_sub, bang_s_h_add, bang_s_h_sub;
 String ip;
 
 ControlP5 cp5;
@@ -258,27 +258,27 @@ class Animation {
 public void controlSetup() {
   cp5 = new ControlP5(this);
 
-  slider_s_w = cp5.addSlider("canvas_width")
+  slider_c_w = cp5.addSlider("canvas_width")
     .setPosition(10, 10)
     .setSize(200, 30)
     .setRange(1, 2400)
     .setValue(1200)
     ;
 
-  bang_s_w_add = cp5.addBang("syphonWadd")
+  bang_c_w_add = cp5.addBang("canvas_width_add")
     .setPosition(170, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
 
-  bang_s_w_sub = cp5.addBang("syphonWsub")
+  bang_c_w_sub = cp5.addBang("canvas_width_sub")
     .setPosition(10, 40)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false);
   ;
-  slider_s_h = cp5.addSlider("canvas_height")
+  slider_c_h = cp5.addSlider("canvas_height")
     .setPosition(10, 50)
     .setSize(200, 30)
     .setRange(1, 2400)
@@ -291,7 +291,7 @@ public void controlSetup() {
     .setTriggerEvent(Bang.RELEASE)
     .setLabelVisible(false)
     ;
-  bang_s_h_sub = cp5.addBang("syphonHsub")
+  bang_s_h_sub = cp5.addBang("canvas_height_sub")
     .setPosition(10, 80)
     .setSize(40, 10)
     .setTriggerEvent(Bang.RELEASE)
@@ -577,14 +577,14 @@ public void typeRadio(int theC) {
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+    if (theEvent.getController().equals(slider_c_w) || theEvent.getController().equals(slider_c_h) ) {
       createCanvas();
     } else if (theEvent.getController().equals(bang_update_ip)) {
       updateIP();
     } 
-    if (theEvent.getController().equals(bang_s_w_add)) {
+    if (theEvent.getController().equals(bang_c_w_add)) {
       adjustSyphon("canvas_width", 1);
-    } else if (theEvent.getController().equals(bang_s_w_sub)) {
+    } else if (theEvent.getController().equals(bang_c_w_sub)) {
       adjustSyphon("canvas_width", -1);
     } else if (theEvent.getController().equals(bang_s_h_add)) {
       adjustSyphon("canvas_height", 1);

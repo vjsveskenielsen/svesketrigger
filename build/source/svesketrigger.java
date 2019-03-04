@@ -28,16 +28,18 @@ public class svesketrigger extends PApplet {
 
 
 
-String[] triggers = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
 String[] eases = {"LINEAR", "EASE IN", "EASE OUT", "EASE IN_OUT"};
-int[] size_presets = {480, 640, 720, 800, 1024, 1200, 1920};
+int[] size_presets = {480, 576, 640, 720, 768, 960, 1024, 1280, 1440, 1920};
 
 ControlP5 cp5;
 CallbackListener cb;
-Slider slider_s_w, slider_s_h;
+
+int triggerID = 0;
+int easesID = 1;
+int settingsID = 2;
+Slider slider_c_w, slider_c_h;
 Numberbox n1, n2, n3, n4;
-Toggle toggle_resize_lock;
-Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
+Bang bang_logo, bang_update_ip, bang_c_w_add, bang_c_w_sub, bang_s_h_add, bang_s_h_sub;
 RadioButton radio_w_presets, radio_h_presets, radio_eases;
 Textfield field_port, field_syphon_name;
 
@@ -57,19 +59,19 @@ PImage logo;
 int logotint = 10;
 
 int n = 50;
-int a_n; //current amount of graphics
+int a_n; //current amount of graphics in action
 PShader shader;
 ArrayList<Graphic> graphics = new ArrayList<Graphic>();
 Animation inactive = new Animation("inactive", 0.f);
-Animation line_ttb = new Animation("line_ttb", 1.f, 0.f, 1.f);
-Animation line_btt = new Animation("line_btt", 1.f, 1.f, 0.f);
-Animation line_rtl = new Animation("line_rtl", 2.f, 0.f, 1.f);
-Animation line_ltr = new Animation("line_ltr", 2.f, 1.f, 0.f);
+Animation line_ttb = new Animation("line_ttb", 1.f, 1.f, 0.f);
+Animation line_btt = new Animation("line_btt", 1.f, 0.f, 1.f);
+Animation line_rtl = new Animation("line_rtl", 2.f, 1.f, 0.f);
+Animation line_ltr = new Animation("line_ltr", 2.f, 0.f, 1.f);
 Animation ring_out = new Animation("ring_out", 3.f, 0.f, 1.f);
 Animation ring_in = new Animation("ring_in", 3.f, 1.f, 0.f);
+Animation[] animations = {inactive, ring_out, ring_in, line_rtl, line_ltr, line_ttb, line_btt};
 
-float speed =.1f, linewidth =.1f;
-float bleed = 0.1f;
+float speed =.1f, linewidth =.1f, bleed = 0.1f;
 
 public void settings() {
   size(400, 600, P3D);
@@ -96,25 +98,10 @@ public void setup() {
 }
 
 public void draw() {
-  if (keyPressed && keyCode=='p') println(mouseX + " " + mouseY);
   background(127);
-  if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
-    logotint = 180;
-  }
-  else {
-    logotint = 10;
-  }
-  tint(logotint);
-  image(logo, 345, 10, 30, 30);
-  tint(255);
-  if (bool_resize_lock) {
-    cp5.getController("canvas_width").setLock(false);
-    cp5.getController("canvas_height").setLock(false);
-    resizeSyphonToWindow();
-  } else {
-    cp5.getController("canvas_width").setLock(true);
-    cp5.getController("canvas_height").setLock(true);
-  }
+
+  resizeSyphonToWindow();
+
   for (Graphic g : graphics) {
     g.update();
     //print("g" + g.target, "s:" + g.offset, round(g.progress, 1), " // ");
@@ -149,7 +136,8 @@ public void resizeSyphonToWindow() {
   if (canvas_width > canvas_height) {
     tW = max;
     tH = (tW/canvas_width)*canvas_height;
-  } else {
+  }
+  else {
     tH = max;
     tW = (tH/canvas_height)*canvas_width;
   }
@@ -164,45 +152,40 @@ public void resizeSyphonToWindow() {
 }
 //filter osc messages and pass trigger through to chooseAnimation()
 public void oscEvent(OscMessage theOscMessage) {
-
   String str_in[] = split(theOscMessage.addrPattern(), '/');
-  if (str_in[1].equals("svesketrigger")) {
-    if (str_in[2].equals("linewidth") && theOscMessage.checkTypetag("f")) {
-      float value = theOscMessage.get(0).floatValue();
-      float max = cp5.getController("linewidth").getMax();
-      cp5.getController("linewidth").setValue(value*max);
-    } else if (str_in[2].equals("speed") && theOscMessage.checkTypetag("f")) {
-      float value = theOscMessage.get(0).floatValue();
-      float max = cp5.getController("speed").getMax();
-      cp5.getController("speed").setValue(value*max);
-    } else {
-
+  if (str_in[1].equals("svesketrigger") && cp5.getController(str_in[2]) != null) {
+    Controller c = cp5.getController(str_in[2]);
+    if (c.getId() == triggerID && a_n < n) {
+      for (int i = 1; i<animations.length; i++) {
+        if (str_in[2].equals(animations[i].type)) trigAnimation(animations[i]);
+      }
+    }
+    else if (c.getId() == settingsID && theOscMessage.checkTypetag("f")) {
+      float v = theOscMessage.get(0).floatValue();
+      c.setValue(v * c.getMax());
     }
   }
 }
+
 
 public void updateIP() {
   ip = Server.ip();
   cp5.getController("bang_update_ip").setLabel("local IP is: " + ip);
 }
-
-public void mousePressed() {
-  if (mouseX > 335 && mouseX < 365 && mouseY > 10 && mouseY <40) {
-    link("http://sveskenielsen.dk/");
-  }
-}
-
-public void keyPressed() {
+/*
+void keyPressed() {
   if (a_n < n) {
-    if (key=='1') trigAnimation(ring_in);
-    else if (key=='2') trigAnimation(ring_out);
-    else if (key=='3') trigAnimation(line_btt);
-    else if (key=='4') trigAnimation(line_ttb);
-    else if (key=='5') trigAnimation(line_rtl);
-    else if (key=='6') trigAnimation(line_ltr);
+    switch(key) {
+      case '1': trigAnimation(ring_in); break;
+      case '2': trigAnimation(ring_out); break;
+      case '3': trigAnimation(line_btt); break;
+      case '4': trigAnimation(line_ttb); break;
+      case '5': trigAnimation(line_rtl); break;
+      case '6': trigAnimation(line_ltr); break;
+    }
   }
 }
-
+*/
 public void trigAnimation(Animation a) {
   /*
   loop through graphics, and set new parameters at the first available (inactive)
@@ -267,6 +250,7 @@ class Animation {
   }
 public void controlSetup() {
   cp5 = new ControlP5(this);
+  Controller c; //temp controller
   int grp_offset = width/3;
   int xoff = 10;
   int yoff = 10;
@@ -274,14 +258,14 @@ public void controlSetup() {
   Group output = cp5.addGroup("output")
   .setPosition(0, 10)
   .setWidth(grp_offset)
-  .setLabel("output")
+  .setLabel("output settings")
   .activateEvent(true)
   ;
 
   Group osc = cp5.addGroup("osc")
   .setPosition(grp_offset,10)
   .setWidth(grp_offset)
-  .setLabel("osc connection")
+  .setLabel("osc & syphon settings")
   .activateEvent(true)
   ;
 
@@ -312,31 +296,38 @@ public void controlSetup() {
 
   // OUTPUT
 
-  bang_s_w_sub = cp5.addBang("syphonWsub")
+  bang_c_w_sub = cp5.addBang("canvas_width_sub")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(200, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("-")
   ;
+  cp5.getController("canvas_width_sub").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
-  xoff += 15+5;
-  slider_s_w = cp5.addSlider("canvas_width")
+
+  xoff += 20+5;
+  slider_c_w = cp5.addSlider("canvas_width")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(200, 20)
+  .setSize(width-70, 20)
   .setRange(1, 2400)
   .setValue(640)
+  .setLabel("width: ")
   ;
+  c = cp5.getController("canvas_width");
+  c.getValueLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
+  c.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
 
-  xoff += slider_s_w.getWidth()+5;
-  bang_s_w_add = cp5.addBang("syphonWadd")
+  xoff += c.getWidth()+5;
+  bang_c_w_add = cp5.addBang("canvas_width_add")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("+")
   ;
+  cp5.getController("canvas_width_add").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
   xoff = 10;
   yoff+= 25;
@@ -346,47 +337,43 @@ public void controlSetup() {
   .setItemWidth(10)
   .setItemHeight(10)
   .setItemsPerRow(size_presets.length)
-  .setSpacingColumn(30)
+  .setSpacingColumn(25)
   .setNoneSelectedAllowed(true)
   ;
 
   xoff=10;
   yoff+=15;
-  bang_s_h_sub = cp5.addBang("syphonHsub")
+  bang_s_h_sub = cp5.addBang("canvas_height_sub")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false);
+  .setLabel("-")
   ;
+  cp5.getController("canvas_height_sub").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
-  xoff += 15+5;
-  slider_s_h = cp5.addSlider("canvas_height")
+  xoff += 25;
+  slider_c_h = cp5.addSlider("canvas_height")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(150, 20)
+  .setSize(width-70, 20)
   .setRange(1, 2400)
   .setValue(480)
+  .setLabel("height: ")
   ;
+  c = cp5.getController("canvas_height");
+  c.getValueLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
+  c.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER).setPaddingX(c.getWidth()/2);
 
-  xoff=width-15-50;
-  toggle_resize_lock = cp5.addToggle("bool_resize_lock")
+  xoff += slider_c_w.getWidth()+5;
+  bang_s_h_add = cp5.addBang("canvas_height_add")
   .setGroup(output)
   .setPosition(xoff, yoff)
-  .setSize(50, 20)
-  .setValue(true)
-  .setMode(ControlP5.SWITCH)
-  .setLabel("resize lock")
-  ;
-
-  xoff += 150+5;
-  bang_s_h_add = cp5.addBang("syphonHadd")
-  .setGroup(output)
-  .setPosition(xoff, yoff)
-  .setSize(15, 20)
+  .setSize(20, 20)
   .setTriggerEvent(Bang.RELEASE)
-  .setLabelVisible(false)
+  .setLabel("+")
   ;
+  cp5.getController("canvas_height_add").getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0);
 
   xoff = 10;
   yoff += 25;
@@ -396,40 +383,40 @@ public void controlSetup() {
   .setItemWidth(10)
   .setItemHeight(10)
   .setItemsPerRow(size_presets.length)
-  .setSpacingColumn(30)
+  .setSpacingColumn(25)
   .setNoneSelectedAllowed(true)
   ;
 
   for (int i = 0; i<size_presets.length; i++) {
     String name = str(size_presets[i]);
     radio_h_presets.addItem(name, i);
-    radio_w_presets.addItem(name+" ", i);
+    radio_w_presets.addItem(name+" ", i); //hack that allows two sets of similar items
   }
-
-  xoff = 0;
+  /*
+  xoff = width-50;
   yoff = 10;
 
-  cp5.addTextarea("txt")
-  .setGroup("howto")
-  .setPosition(5, 5)
-  .setSize(120, 400)
-  .setFont(createFont("arial", 10))
-  .setLineHeight(12)
-  .setColor(color(255))
-  .setText(addExplainer());
-
-  xoff += 10-grp_offset;
+  cp5.addBang("bang_logo")
+  .setGroup(output)
+  .setPosition(xoff, yoff)
+  .setSize(20, 20)
+  .setImage(logo)
+  .setTriggerEvent(Bang.RELEASE)
+  .setLabelVisible(false)
+  ;
+  */
+  // OSC & SYPHON
+  xoff = 10-grp_offset;
   yoff = 10;
-  // OSC
-  bang_update_ip =  cp5.addBang("bang_update_ip")
+  bang_update_ip = cp5.addBang("bang_update_ip")
   .setGroup(osc)
   .setPosition(xoff, yoff)
   .setSize(30, 30)
   .setTriggerEvent(Bang.RELEASE)
   .setLabel(ip)
   ;
-  yoff+= 50;
 
+  yoff+= 50;
   field_port = cp5.addTextfield("field_port")
   .setGroup(osc)
   .setPosition(xoff, yoff)
@@ -485,6 +472,64 @@ public void controlSetup() {
     }
   }
   );
+  // HOW TO
+  xoff = 5-grp_offset*2;
+  yoff = 5;
+  cp5.addTextarea("¶1")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("Match OSC output IP and port with external OSC source " +
+  "in OSC & SYPHON SETTINGS."
+  + "\n" + "\n" +
+  "All OSC messages must begin with / svesketrigger");
+
+  xoff += grp_offset;
+  cp5.addTextarea("¶2")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset-10, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("TRIGGERS:"
+  + "\n" +
+  "... / ring_out"
+  + "\n" +
+  "... / ring_in"
+  + "\n" +
+  "... / line_ltr"
+  + "\n" +
+  "... / line_rtl"
+  + "\n" +
+  "... / line_ttb"
+  + "\n" +
+  "... / line_btt"
+
+  );
+
+  xoff += grp_offset;
+  cp5.addTextarea("¶3")
+  .setGroup("howto")
+  .setPosition(xoff, yoff)
+  .setSize(grp_offset-10, 400)
+  .setFont(createFont("arial", 10))
+  .setLineHeight(12)
+  .setColor(color(255))
+  .setText("SLIDERS:"
+  + "\n" +
+  "Slider values must be normalised floats"
+  + "\n" + "\n" +
+  "/linewidth"
+  + "\n" +
+  "/speed"
+  + "\n" +
+  "/bleed"
+  );
+
   //TRIGGERS
   xoff = 10;
   yoff = 560;
@@ -507,6 +552,7 @@ public void controlSetup() {
   .setRange(.001f, 1.f)
   .setValue(.5f)
   .setLabel("line bleed")
+  .setId(settingsID)
   ;
   cp5.getController("bleed").getCaptionLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
 
@@ -522,12 +568,13 @@ public void controlSetup() {
 
   xoff = 10;
   yoff = 500;
-  for (int i = 0; i<triggers.length; i++) {
-    cp5.addBang(triggers[i])
+  for (int i = 1; i<animations.length; i++) {
+    cp5.addBang(animations[i].type)
     .setPosition(xoff, yoff)
     .setSize(40, 40)
     .setTriggerEvent(Bang.RELEASE)
-    .setLabel(triggers[i])
+    .setLabel(animations[i].type)
+    .setId(triggerID)
     ;
     xoff+=45;
   }
@@ -543,8 +590,12 @@ public void controlSetup() {
   radio_eases.activate(0);
 
 }
+public void bang_logo(){
+  println("bang");
+  link("http://sveskenielsen.dk/");
+}
 
-public void typeRadio(int theC) {
+public void radio_eases(int theC) {
   switch(theC) {
     case(0):
     Ani.setDefaultEasing(Ani.LINEAR);
@@ -585,25 +636,21 @@ public void controlEvent(ControlEvent theEvent) {
 
   if (theEvent.isController()) {
     String name =theEvent.getController().getName();
-    if (theEvent.getController().equals(slider_s_w) || theEvent.getController().equals(slider_s_h) ) {
+
+    for (int i = 1; i<animations.length; i++){
+      if (name.equals(animations[i].type)) {
+        trigAnimation(animations[i]);
+      }
+    }
+    if (theEvent.getController().equals(slider_c_w) || theEvent.getController().equals(slider_c_h) ) {
       createCanvas();
     }
-    else if (theEvent.getController().equals(bang_update_ip)) {
-      updateIP();
-    }
+    else if (theEvent.getController().equals(bang_update_ip)) updateIP();
 
-    if (theEvent.getController().equals(bang_s_w_add)) {
-      adjustSyphon("canvas_width", 1);
-    }
-    else if (theEvent.getController().equals(bang_s_w_sub)) {
-      adjustSyphon("canvas_width", -1);
-    }
-    else if (theEvent.getController().equals(bang_s_h_add)) {
-      adjustSyphon("canvas_height", 1);
-    }
-    else if (theEvent.getController().equals(bang_s_h_sub)) {
-      adjustSyphon("canvas_height", -1);
-    }
+    if (theEvent.getController().equals(bang_c_w_add)) adjustSyphon("canvas_width", 1);
+    else if (theEvent.getController().equals(bang_c_w_sub)) adjustSyphon("canvas_width", -1);
+    else if (theEvent.getController().equals(bang_s_h_add)) adjustSyphon("canvas_height", 1);
+    else if (theEvent.getController().equals(bang_s_h_sub)) adjustSyphon("canvas_height", -1);
 
   }
 }
@@ -653,36 +700,6 @@ public void field_syphon_name(String theText){
 public void updateOSC() {
   ip = Server.ip();
   oscP5 = new OscP5(this, port);
-}
-
-public String addExplainer(){
-  String t = "Match OSC output IP and port with external OSC source in the OSC CONNECTION menu."
-  + "\n" + "\n" +
-  "All OSC messages must begin with " + "\n" +  "'' /svesketrigger/ ''"
-  + "\n" + "\n" +
-  "TRIGGERS:"
-  + "\n" +
-  "/ring_out"
-  + "\n" +
-  "/ring_in"
-  + "\n" +
-  "/line_ltr"
-  + "\n" +
-  "/line_rtl"
-  + "\n" +
-  "/line_ttb"
-  + "\n" +
-  "/line_btt"
-  + "\n" + "\n" +
-  "SLIDERS:"
-  + "\n" +
-  "Slider values must be normalised floats"
-  + "\n" + "\n" +
-  "/linewidth"
-  + "\n" +
-  "/speed"
-  ;
-  return t;
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "svesketrigger" };

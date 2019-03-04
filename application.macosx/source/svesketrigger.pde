@@ -7,11 +7,11 @@ import processing.net.*;
 
 String[] types = {"ring_out", "ring_in", "line_ltr", "line_rtl", "line_ttb", "line_btt"};
 OscP5 oscP5;
-Slider slider_s_w, slider_s_h;
+Slider slider_c_w, slider_c_h;
 Numberbox n1, n2, n3, n4;
 Toggle toggle_resize_lock;
 CallbackListener cb;
-Bang bang_update_ip, bang_s_w_add, bang_s_w_sub, bang_s_h_add, bang_s_h_sub;
+Bang bang_update_ip, bang_c_w_add, bang_c_w_sub, bang_s_h_add, bang_s_h_sub;
 String ip;
 
 ControlP5 cp5;

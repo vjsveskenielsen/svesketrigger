@@ -345,7 +345,7 @@ public void bang_logo(){
   link("http://sveskenielsen.dk/");
 }
 
-void typeRadio(int theC) {
+void radio_eases(int theC) {
   switch(theC) {
     case(0):
     Ani.setDefaultEasing(Ani.LINEAR);
